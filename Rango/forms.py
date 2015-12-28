@@ -20,6 +20,5 @@ class PageForm(forms.ModelForm):
 
     class Meta:
         model = Page
-        fields = ('title', 'url', 'views', )  # or
-        #exlcude = ('category', )
+        fields = ('title', 'url', 'views', )
 

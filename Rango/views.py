@@ -27,6 +27,8 @@ def category(request, category_name_slug):
 
         context["category"] = cat
 
+        context["category_name_slug"] = category_name_slug
+
     except Category.DoesNotExist:
         pass
 
@@ -52,13 +54,13 @@ def add_category(request):
     return render(request, "Rango/add_category.html", {"form": form})
 
 
-def add_page(request,category_name_slug):
+def add_page(request, category_name_slug):
     try:
         cat = Category.objects.get(slug=category_name_slug)
     except Category.DoesNotExist:
         cat = None
 
-    if request.method == "POST":
+    if request.method == 'POST':
         form = PageForm(request.POST)
         if form.is_valid():
             if cat:
@@ -72,5 +74,7 @@ def add_page(request,category_name_slug):
     else:
         form = PageForm()
 
-    context = {"form": form, "category": cat}
-    return render(request, "/Rango/add_page.html", context)
+    context_dict = {'form': form, 'category': cat}
+
+    return render(request, 'rango/add_page.html', context_dict)
+
