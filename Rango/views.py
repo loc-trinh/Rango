@@ -2,7 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from Rango.models import Category, Page
 from Rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
@@ -40,7 +41,7 @@ def about(request):
     html = "<p>This is the about page</p><a href='/rango'>Index</a>"
     return HttpResponse(html)
 
-
+@login_required
 def add_category(request):
     if request.method == "POST":
         form = CategoryForm(request.POST)
@@ -55,7 +56,7 @@ def add_category(request):
     context = {'form': form}
     return render(request, "Rango/add_category.html", context)
 
-
+@login_required
 def add_page(request, category_name_slug):
     try:
         cat = Category.objects.get(slug=category_name_slug)
@@ -128,3 +129,8 @@ def user_login(request):
 
     context = {}
     return render(request, "Rango/login.html", context)
+
+@login_required
+def user_logout(request):
+    logout(request)
+    return HttpResponseRedirect('/rango/')
