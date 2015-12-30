@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from Rango.models import Category, Page
-from Rango.forms import CategoryForm, PageForm
+from Rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
 
 
 def index(request):
@@ -51,7 +51,8 @@ def add_category(request):
     else:
         form = CategoryForm()
 
-    return render(request, "Rango/add_category.html", {"form": form})
+    context = {'form': form}
+    return render(request, "Rango/add_category.html", context)
 
 
 def add_page(request, category_name_slug):
@@ -74,7 +75,35 @@ def add_page(request, category_name_slug):
     else:
         form = PageForm()
 
-    context_dict = {'form': form, 'category': cat}
+    context = {'form': form, 'category': cat}
 
-    return render(request, 'rango/add_page.html', context_dict)
+    return render(request, 'rango/add_page.html', context)
 
+
+def register(request):
+    registered = False
+
+    if request.method == 'POST':
+        user_form = UserForm(request.POST)
+        profile_form = UserProfileForm(request.POST)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save(commit=False)
+            user.set_password(user.password)
+            user.save()
+
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            if 'picture' in request.FILES:
+                profile.picture = request.FILES['picture']
+
+            profile.save()
+            registered = True
+        else:
+            print user_form.errors, profile_form.errors
+    else:
+        user_form = UserForm()
+        profile_form = UserProfileForm()
+
+    context = {'user_form': user_form, 'profile_form': profile_form, 'registered': registered}
+    return render(request, "Rango/register.html", context)
