@@ -85,8 +85,10 @@ STATICFILES_DIRS = (
 )
 
 TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates')
+APP_TEMPLATE_PATH = os.path.join(TEMPLATE_PATH, 'Rango')
 TEMPLATE_DIRS = (
     TEMPLATE_PATH,
+    APP_TEMPLATE_PATH,
 )
 
 MEDIA_URL = '/media/'
