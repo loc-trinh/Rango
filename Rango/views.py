@@ -38,8 +38,7 @@ def category(request, category_name_slug):
 
 
 def about(request):
-    html = "<p>This is the about page</p><a href='/rango'>Index</a>"
-    return HttpResponse(html)
+    return render(request, 'Rango/about.html', {})
 
 @login_required
 def add_category(request):
