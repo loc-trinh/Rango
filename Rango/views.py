@@ -5,6 +5,7 @@ from Rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
+from bing_search import run_query
 
 
 def index(request):
@@ -105,7 +106,17 @@ def add_page(request, category_name_slug):
 
     context = {'form': form, 'category': cat}
 
-    return render(request, 'rango/add_page.html', context)
+    return render(request, "Rango/add_page.html", context)
+
+
+def search(request):
+    result_list = []
+    if request.method == "POST":
+        query = request.POST['query'].strip()
+        if query:
+            result_list = run_query(query)
+
+    return render(request, "Rango/search.html", {'result_list': result_list})
 
 
 # def register(request):
