@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
 
-{% block body_block %}
-    <h1>Add a Page</h1>
-    {% if category %}
-        <form id="page_form" method="post" action="{% url 'add_page' category.slug %}">
-            {% csrf_token %}
-            {% for hidden in form.hidden_fields %}
-                {{ hidden }}
-            {% endfor %}
+{% block title %} Add Page {% endblock %}
 
-            {% for field in form.visible_fields %}
-                {{ field.errors }}
-                {{ field.help_text }}
-                {{ field }}
-            {% endfor %}
-            {# {{ form.as_p }} #}
-            <input type="submit" name="submit" value="Create page" />
+{% load bootstrap %}
+
+{% block body_block %}
+<div class="page-header">
+    <h1>Add a Page</h1>
+</div>
+    {% if category %}
+        <form role="form" id="page_form" method="post" action="{% url 'add_page' category.slug %}">
+            {% csrf_token %}
+            {{ form|bootstrap }}
+
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">Create page</button>
+        </div>
         </form>
     {% else %}
         This category doesn't exist! Cannot add a page.

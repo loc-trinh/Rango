@@ -1,11 +1,19 @@
 {% extends "Rango/base.html" %}
 
-{% block body_block %}
-<h1>Register Here</h1>
-    <form method="post" action=".">
-        {% csrf_token %}
-        {{ form.as_p }}
+{% block title %} Register{% endblock %}
 
-        <input type="submit" value="Submit" />
+{% load bootstrap %}
+
+{% block body_block %}
+<div class="page-header">
+    <h1>Register Here</h1>
+</div>
+    <form role="form" method="post" action=".">
+        {% csrf_token %}
+        {{ form|bootstrap }}
+
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
     </form>
 {% endblock %}

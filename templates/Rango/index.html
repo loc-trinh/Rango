@@ -1,33 +1,51 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 
+{% block title %} Index {% endblock %}
+
 {% block body_block %}
+ <div class="page-header">
     {% if user.is_authenticated %}
         <h1>Hello, world! Hi {{ user.username }}</h1>
     {% else %}
         <h1>Hello, world!</h1>
     {% endif %}
-    <h2> Categories </h2>
+ </div>
+
+<div class="row placeholders">
+    <div class="col-xs-12 col-sm-6 placeholder">
+    <div class="panel panel-primary">
+    <div class="panel-heading">
+    <h4 class="panel-title"> Top 5 Categories </h4>
+    </div>
+    </div>
     {% if categories %}
-        <ul>
+        <ul class="list-group">
             {% for category in categories %}
-            <li><a href="{% url 'category' category.slug %}">{{ category.name }}</a></li>
+            <li class="list-group-item"><a href="{% url 'category' category.slug %}">{{ category.name }}</a></li>
             {% endfor %}
         </ul>
     {% else %}
         <strong>There are no categories present.</strong>
     {% endif %}
+    </div>
+    <div class="col-xs-12 col-sm-6 placeholder">
 
-    <h2>Top 5 Pages</h2>
+    <div class="panel panel-primary">
+    <div class="panel-heading">
+    <h4 class="panel-title">Top 5 Pages</h4>
+    </div>
+    </div>
     {% if pages %}
-        <ul>
+        <ul class="list-group">
             {% for page in pages %}
-                <li><a href="{{ page.url }}">{{ page.title }}</a> - {{ page.category.name }} ({{ page.views }} views)</li>
+                <li class="list-group-item"><a href="{{ page.url }}">{{ page.title }}</a> - {{ page.category.name }} ({{ page.views }} views)</li>
             {% endfor %}
         </ul>
     {% else %}
         <strong> There are no top 5 most viewed pages.</strong>
     {% endif %}
+    </div>
 
     <img src="{% static "images/rango.jpg" %}" alt="Picture of Rango" />
 {% endblock %}
