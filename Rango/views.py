@@ -56,6 +56,13 @@ def category(request, category_name_slug):
     except Category.DoesNotExist:
         pass
 
+    result_list = []
+    if request.method == "POST":
+        query = request.POST['query'].strip()
+        if query:
+            result_list = run_query(query)
+    context['result_list'] = result_list
+
     return render(request, "Rango/category.html", context)
 
 
@@ -107,16 +114,6 @@ def add_page(request, category_name_slug):
     context = {'form': form, 'category': cat}
 
     return render(request, "Rango/add_page.html", context)
-
-
-def search(request):
-    result_list = []
-    if request.method == "POST":
-        query = request.POST['query'].strip()
-        if query:
-            result_list = run_query(query)
-
-    return render(request, "Rango/search.html", {'result_list': result_list})
 
 
 def track_url(request):

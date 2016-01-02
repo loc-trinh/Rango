@@ -6,7 +6,7 @@
         {% if pages %}
         <ul>
             {% for page in pages %}
-                <li><a href="{% url "goto"%}?page_id={{ page.id }}">{{ page.title }}</a> </li>
+                <li><a href="{% url "goto"%}?page_id={{ page.id }}">{{ page.title }}</a> - {{ page.views }} views </li>
             {% endfor %}
         </ul>
         {% else %}
@@ -14,10 +14,43 @@
         {% endif %}
         <br />
         {% if user.is_authenticated %}
-            <a href="{% url 'add_page' category.slug %}">Add a Page</a>
+            <a href="{% url 'add_page' category.slug %}">Add a Page</a><br>
         {% endif %}
     {% else %}
         This category does not exist! <br />
         <a href="{% url 'add_category' %}">Add category.</a>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+    <div class="row">
+        <div class="panel panel-primary">
+            <br/>
+            <form class="form-inline" id="user_form" method="post" action="{% url 'category' category.slug%}">
+                {% csrf_token %}
+                <!-- Display the search form elements here -->
+                <input class="form-control" type="text" size="70" name="query" value="" id="query" style="margin-left: 20px"/>
+                <input class="btn btn-primary" type="submit" name="submit" value="Search" />
+                <br />
+            </form>
+            <div class="panel">
+                {% if result_list %}
+                <div class="panel-heading">
+                    <h3 class="panel-title">Results</h3>
+                    <!-- Display search results in an ordered list -->
+                    <div class="panel-body">
+                        <div class="list-group">
+                            {% for result in result_list %}
+                                <div class="list-group-item">
+                                    <h4 class="list-group-item-heading"><a href="{{ result.link }}">{{ result.title }}</a></h4>
+                                    <p class="list-group-item-text">{{ result.summary }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
     {% endif %}
 {% endblock %}
