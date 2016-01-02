@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
+{% block title %}About{% endblock %}
+
 {% block body_block %}
-    <p> This is the about page.</p>
-    <p> Visits: {{ visits }}</p>
+<div class="page-header">
+    <h1>About</h1>
+</div>
+<div>
+    <p>You have visited the site: <strong>{{ visits }} time(s)</strong></p>
+    <p> Here's a picture of Rango!</p>
+    <img src="{% static "images/rango.jpg" %}" alt="Picture of Rango" />
+</div>
 {% endblock %}
