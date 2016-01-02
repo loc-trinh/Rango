@@ -16,26 +16,27 @@ def index(request):
     page_list = Page.objects.order_by('-views')[:5]
     context["pages"] = page_list
 
-    visits = int(request.COOKIES.get('visits','1'))
+    visits = request.session.get('visits')
+    if not visits:
+        visits = 1
     reset_last_visit_time = False
-    response = render(request, "Rango/index.html", context)
 
-    if 'last_visit' in request.COOKIES:
-        last_visit = request.COOKIES['last_visit']
-        last_visit_time = last_visit_time = datetime.strptime(last_visit[:-7], "%Y-%m-%d %H:%M:%S")
-        if (datetime.now() - last_visit_time).days > 1:
+    last_visit = request.session.get('last_visit')
+    if last_visit:
+        last_visit_time = datetime.strptime(last_visit[:-7], "%Y-%m-%d %H:%M:%S")
+
+        if (datetime.now() - last_visit_time).seconds > 0:
             visits += 1
             reset_last_visit_time = True
     else:
         reset_last_visit_time = True
-        context["visits"] = visits
-        response = render(request, "Rango/index.html", context)
 
     if reset_last_visit_time:
-        response.set_cookie('last_visit', datetime.now())
-        response.set_cookie('visits', visits)
+        request.session['last_visit'] = str(datetime.now())
+        request.session['visits'] = visits
+    context['visits'] = visits
 
-    return response
+    return render(request, "Rango/index.html", context)
 
 
 def category(request, category_name_slug):
@@ -58,7 +59,12 @@ def category(request, category_name_slug):
 
 
 def about(request):
-    return render(request, 'Rango/about.html', {})
+    if request.session.get('visits'):
+        count = request.session.get('visits')
+    else:
+        count = 0
+    return render(request, 'Rango/about.html', {'visits': count})
+
 
 @login_required
 def add_category(request):
@@ -74,6 +80,7 @@ def add_category(request):
 
     context = {'form': form}
     return render(request, "Rango/add_category.html", context)
+
 
 @login_required
 def add_page(request, category_name_slug):
@@ -101,55 +108,55 @@ def add_page(request, category_name_slug):
     return render(request, 'rango/add_page.html', context)
 
 
-def register(request):
-    registered = False
-
-    if request.method == 'POST':
-        user_form = UserForm(request.POST)
-        profile_form = UserProfileForm(request.POST)
-
-        if user_form.is_valid() and profile_form.is_valid():
-            user = user_form.save(commit=False)
-            user.set_password(user.password)
-            user.save()
-
-            profile = profile_form.save(commit=False)
-            profile.user = user
-            if 'picture' in request.FILES:
-                profile.picture = request.FILES['picture']
-
-            profile.save()
-            registered = True
-        else:
-            print user_form.errors, profile_form.errors
-    else:
-        user_form = UserForm()
-        profile_form = UserProfileForm()
-
-    context = {'user_form': user_form, 'profile_form': profile_form, 'registered': registered}
-    return render(request, "Rango/register.html", context)
-
-
-def user_login(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(username=username, password=password)
-        if user:
-            if user.is_active:
-                login(request, user)
-                return HttpResponseRedirect('/rango/')
-            else:
-                return HttpResponse("Your Rango account is disabled")
-        else:
-            print "Invalid login details: {0} {1}".format(username, password)
-            return HttpResponse("Invalid login details supplied.")
+# def register(request):
+#     registered = False
+#
+#     if request.method == 'POST':
+#         user_form = UserForm(request.POST)
+#         profile_form = UserProfileForm(request.POST)
+#
+#         if user_form.is_valid() and profile_form.is_valid():
+#             user = user_form.save(commit=False)
+#             user.set_password(user.password)
+#             user.save()
+#
+#             profile = profile_form.save(commit=False)
+#             profile.user = user
+#             if 'picture' in request.FILES:
+#                 profile.picture = request.FILES['picture']
+#
+#             profile.save()
+#             registered = True
+#         else:
+#             print user_form.errors, profile_form.errors
+#     else:
+#         user_form = UserForm()
+#         profile_form = UserProfileForm()
+#
+#     context = {'user_form': user_form, 'profile_form': profile_form, 'registered': registered}
+#     return render(request, "Rango/register.html", context)
 
 
-    context = {}
-    return render(request, "Rango/login.html", context)
-
-@login_required
-def user_logout(request):
-    logout(request)
-    return HttpResponseRedirect('/rango/')
+# def user_login(request):
+#     if request.method == 'POST':
+#         username = request.POST.get('username')
+#         password = request.POST.get('password')
+#         user = authenticate(username=username, password=password)
+#         if user:
+#             if user.is_active:
+#                 login(request, user)
+#                 return HttpResponseRedirect('/rango/')
+#             else:
+#                 return HttpResponse("Your Rango account is disabled")
+#         else:
+#             print "Invalid login details: {0} {1}".format(username, password)
+#             return HttpResponse("Invalid login details supplied.")
+#
+#     context = {}
+#     return render(request, "Rango/login.html", context)
+#
+#
+# @login_required
+# def user_logout(request):
+#     logout(request)
+#     return HttpResponseRedirect('/rango/')
