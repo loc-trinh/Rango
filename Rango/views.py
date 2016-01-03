@@ -46,7 +46,7 @@ def category(request, category_name_slug):
         cat = Category.objects.get(slug=category_name_slug)
         context['category_name'] = cat.name
 
-        pages = Page.objects.filter(category=cat)
+        pages = Page.objects.filter(category=cat).order_by("-views")
         context["pages"] = pages
 
         context["category"] = cat
@@ -117,16 +117,34 @@ def add_page(request, category_name_slug):
 
 
 def track_url(request):
+    url='/rango/'
     if request.method == 'GET':
         if 'page_id' in request.GET:
             page_id = request.GET['page_id']
-            page = Page.objects.get(id=page_id)
-            page.views += 1
-            page.save()
-            return HttpResponseRedirect(page.url)
-        else:
-            return HttpResponseRedirect('/rango/')
+            try:
+                page = Page.objects.get(id=page_id)
+                page.views += 1
+                page.save()
+                url=page.url
+            except:
+                pass
+    return HttpResponseRedirect(url)
 
+
+@login_required
+def like_category(request):
+    cat_id = None
+    likes = 0
+    if request.method == "GET":
+        cat_id = request.GET['category_id']
+    if cat_id:
+        cat = Category.objects.get(id=int(cat_id))
+        if cat:
+            likes = cat.likes + 1
+            cat.likes = likes
+            cat.save()
+
+    return HttpResponse(likes)
 
 # def register(request):
 #     registered = False
