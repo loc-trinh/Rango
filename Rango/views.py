@@ -146,6 +146,36 @@ def like_category(request):
 
     return HttpResponse(likes)
 
+
+def suggest_category(request):
+    cat_list = []
+    starts_with = ""
+    if request.method == "GET":
+        starts_with = request.GET['suggestion']
+
+    if starts_with:
+        cat_list = Category.objects.filter(name__istartswith=starts_with)
+    if len(cat_list) > 8:
+        cat_list = cat_list[0:8]
+
+    return render(request, "Rango/cats.html", {"cats":cat_list})
+
+
+@login_required
+def auto_add_page(request):
+    context = {}
+    if request.method == "GET":
+        cat_id = request.GET['category_id']
+        url = request.GET['url']
+        title = request.GET['title']
+        if cat_id:
+            category = Category.objects.get(id=int(cat_id))
+            p = Page.objects.get_or_create(category=category, title=title, url=url)
+
+            pages = Page.objects.filter(category=category).order_by('-views')
+            context["pages"] = pages
+    return render(request, "Rango/page_list.html", context)
+
 # def register(request):
 #     registered = False
 #
